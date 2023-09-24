@@ -1,5 +1,8 @@
 FROM nvidia/cuda:12.2.0-base-ubuntu22.04
 
+ENV TZ=Europe
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 # Install necessary software for the installation of ROS2
 RUN apt-get update && apt-get install -y \ 
                       locales \

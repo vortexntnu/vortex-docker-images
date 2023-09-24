@@ -27,7 +27,7 @@ RUN apt-get update || true && apt-get install -q -y --no-install-recommends \
 
 RUN apt-get update
 
-RUN apt install software-properties-common
+RUN apt install software-properties-common -y
 RUN add-apt-repository universe
 
 RUN apt update && apt install curl -y

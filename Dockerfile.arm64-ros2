@@ -1,0 +1,7 @@
+FROM arm64v8/ros:humble
+
+# add sourcing to shell startup script
+
+RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
+
+#

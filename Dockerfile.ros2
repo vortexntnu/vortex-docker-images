@@ -25,6 +25,8 @@ RUN apt-get update || true && apt-get install -q -y --no-install-recommends \
 #     update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 \
 #     export LANG=en_US.UTF-8
 
+RUN apt-get update
+
 RUN apt install software-properties-common
 RUN add-apt-repository universe
 

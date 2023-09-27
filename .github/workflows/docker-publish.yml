@@ -35,7 +35,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up QEMU
-        if: matrix.architecture != 'amd64'
+        if: matrix.architecture != 'linux/amd64'
         uses: docker/setup-qemu-action@v3
 
       - name: Extract metadata (tags, labels) for Docker
@@ -60,7 +60,7 @@ jobs:
           context: .
           file: Dockerfile.${{ matrix.filename }}
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: ${{ env.REGISTRY }}/${{ env.REPOSITORY_NAME }}-${{ matrix.filename }}:${{ matrix.architecture }}-latest
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

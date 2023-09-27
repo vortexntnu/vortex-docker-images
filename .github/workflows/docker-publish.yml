@@ -21,8 +21,8 @@ jobs:
       fail-fast: false
       matrix:
         architecture:
-          - amd64
-          - arm64
+          - linux/amd64
+          - linux/arm64
         filename:
           - ros2
           - ros2-cuda
@@ -61,8 +61,8 @@ jobs:
           context: .
           file: Dockerfile.${{ matrix.filename }}
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ env.REGISTRY }}/${{ env.REPOSITORY_NAME }}-${{ matrix.filename }}:${{ matrix.architecture }}-latest
+          tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          platforms: linux/amd64,linux/arm64
+          platforms: ${{ matrix.platforms }}

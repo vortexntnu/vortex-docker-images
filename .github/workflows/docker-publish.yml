@@ -14,7 +14,7 @@ env:
   REGISTRY_IMAGE: ${{ github.repository }}
 
 jobs:
-  build-and-push-image:
+  build:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -64,4 +64,4 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          platforms: ${{ matrix.platforms }}
+          platforms: ${{ matrix.architecture }}

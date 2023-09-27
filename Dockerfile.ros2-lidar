@@ -1,0 +1,66 @@
+FROM ghcr.io/vortexntnu/vortex-docker-images-ros2-cuda:latest
+ARG ROS_DISTRO=humble
+ENV DEBIAN_FRONTEND=noninteractive \
+   BUILD_HOME=/var/lib/build \
+   OUSTER_ROS_PATH=/opt/catkin_ws/src/ouster-ros
+
+# Update package lists for latest versions
+RUN set -xe \
+apt-get update && apt-get upgrade -y
+
+# Install the desired ROS packages
+RUN set -xe \
+&& apt-get install -y \
+       ros-$ROS_DISTRO-pcl-ros \
+       ros-$ROS_DISTRO-tf2-eigen 
+
+# Install necessary development packages for building and dependencies
+RUN set -xe \
+&& apt-get update \
+&& apt-get install -y         \
+       build-essential         \
+       libeigen3-dev           \
+       libjsoncpp-dev          \
+       libspdlog-dev           \
+       libcurl4-openssl-dev    \
+       cmake                   \
+       python3-colcon-common-extensions
+
+
+# Clean up apt cache to reduce image size
+RUN set -xe \
+&& rm -rf /var/lib/apt/lists/*
+
+# Set up build environment
+COPY --chown=build:build . $OUSTER_ROS_PATH
+
+USER build:build
+WORKDIR ${BUILD_HOME}
+
+# Clone project into src
+RUN set -xe \
+&& mkdir -p ros2-lidar_ws/src && cd ros2-lidar_ws/src  \
+&& git clone -b ros2 --recurse-submodules https://github.com/ouster-lidar/ouster-ros.git
+
+
+#Source the ROS env to compile the driver
+RUN set -xe \
+&& source /opt/ros/humble/setup.bash
+
+#Invoke colcon build cmd from te catkin workspace
+RUN set -xe \
+&& cd ros2-lidar_ws \
+&& colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release 
+
+#Once the build succeeds, source the install folder of ros2 workspace to add launch commands to env
+RUN set -xe \
+&& source ros2-lidar_ws/install/setup.bash
+
+RUN set -xe \
+&& sed -i "s|sensor_hostname: ''|sensor_hostname: 'os1-122037000366.local'|g"~/ros2-lidar_ws/src/ouster_ros/ouster_ros/config/driver_params.yaml
+
+
+ENTRYPOINT ["bash", "-c", "set -e \
+&& . ./devel/setup.bash \
+&& ros2 launch ouster_ros sensor.launch \"$@\" \
+", "ros-entrypoint"]

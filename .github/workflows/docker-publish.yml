@@ -19,9 +19,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        architecture:
-          - linux/amd64
-          - linux/arm64
         filename:
           - ros2
           - ros2-cuda
@@ -64,4 +61,4 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          platforms: ${{ matrix.architecture }}
+          platforms: linux/arm64,linux/amd64
